@@ -42,10 +42,11 @@ export interface EspnScoreboard {
 
 function parseTeam(competitor: EspnCompetitor | undefined): Team {
   const team = competitor?.team ?? {};
+  // Playoff slots that aren't set yet come back without team data.
   return {
     id: team.id ?? '',
-    abbreviation: team.abbreviation ?? '???',
-    displayName: team.displayName ?? 'Unknown',
+    abbreviation: team.abbreviation ?? 'TBD',
+    displayName: team.displayName ?? 'TBD',
     logo: team.logo,
   };
 }

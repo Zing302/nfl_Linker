@@ -8,15 +8,19 @@ normal Sunday game), and launches the streaming app that carries it.
 
 - **Schedule:** ESPN's public scoreboard API (no key needed). `src/core/scheduleClient.ts`
   parses each event's `geoBroadcasts` into TV networks, streaming networks, and
-  national/regional market.
+  national/regional market. Data is fetched live on load, re-pulled hourly and
+  on app resume, so flexed games and playoff matchups stay current; unset
+  playoff slots show as TBD.
 - **Categorizer** (`src/core/categorizer.ts`): pure function on the kickoff
   converted to US/Eastern (UTC dates roll over for night games).
 - **Resolver** (`src/core/serviceResolver.ts`): prefers ESPN's named streaming
   service (Peacock, Prime Video, Netflix, YouTube…), falls back to a TV-network
   map (NBC→Peacock, CBS→Paramount+, FOX→Fox One, ESPN/ABC→ESPN, NFL
-  Network→NFL+). Regional Sunday-afternoon games for out-of-market viewers
-  resolve to NFL Sunday Ticket (toggle in the header, persisted in
-  localStorage).
+  Network→NFL+). Paramount+ and Fox One stream the local affiliate, so they
+  only resolve for regional games in your market — determined by the ZIP code
+  entered in the header (persisted in localStorage) against each team's
+  approximate DMA in `src/core/marketData.ts`. Out-of-market regional games
+  resolve to NFL Sunday Ticket instead. No ZIP entered = assume in-market.
 - **Launchers** (`src/platform/`): on a TV, a Luna
   `com.webos.applicationManager/launch` call opens the service's app; in a
   desktop browser the service's website opens in a new tab, so the whole app is

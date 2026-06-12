@@ -28,14 +28,27 @@ body {
   margin: 0;
 }
 
-.market-toggle {
+.zip-field {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   font-size: 26px;
-  padding: 12px 28px;
+  color: #8b98a9;
+}
+
+.zip-input {
+  font-size: 28px;
+  width: 220px;
+  padding: 12px 20px;
   border-radius: 12px;
   border: 2px solid #3b4654;
   background: #1b2330;
   color: #f0f3f6;
-  cursor: pointer;
+}
+
+.zip-input:focus {
+  border-color: #60a5fa;
+  outline: none;
 }
 
 .week-selector {

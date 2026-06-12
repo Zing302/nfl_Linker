@@ -80,14 +80,20 @@ describe('resolve – market rule', () => {
     expect(resolve(national, outOfMarket)).toBe(SERVICES.foxOne);
   });
 
-  it('does not apply Sunday Ticket to regional games outside the Sunday-day slot', () => {
-    // Thursday-night kickoff: Sunday Ticket carries Sunday-afternoon games only.
-    const thursday = makeGame({
+  it('routes out-of-market regional FOX games to Sunday Ticket', () => {
+    const foxRegional = makeGame({ market: 'regional', tvNetworks: ['FOX'] });
+    expect(resolve(foxRegional, outOfMarket)).toBe(SERVICES.sundayTicket);
+  });
+
+  it('only overrides the local-affiliate services (Paramount+/Fox One)', () => {
+    // A regional game on a nationally available service stays put —
+    // Peacock streams everywhere, unlike the local CBS/FOX affiliates.
+    const nbcRegional = makeGame({
       date: '2025-09-05T00:20Z',
       market: 'regional',
       tvNetworks: ['NBC'],
     });
-    expect(resolve(thursday, outOfMarket)).toBe(SERVICES.peacock);
+    expect(resolve(nbcRegional, outOfMarket)).toBe(SERVICES.peacock);
   });
 });
 

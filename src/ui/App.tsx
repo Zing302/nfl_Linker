@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Game } from '../core/types';
 import { fetchCurrentWeek, fetchWeek, SEASON_TYPES } from '../core/scheduleClient';
+import { isGameInMarket } from '../core/marketResolver';
 import { WeekSelector } from './WeekSelector';
 import { GameCard } from './GameCard';
 
 const SEASON_YEAR = new Date().getMonth() >= 6 ? new Date().getFullYear() : new Date().getFullYear() - 1;
-const IN_MARKET_KEY = 'nfl-linker:isUserInMarket';
+const ZIP_KEY = 'nfl-linker:zip';
+// Matchups change (flex scheduling, playoff seeding), so a long-running app
+// must re-pull the schedule periodically, not just on load.
+const REFRESH_INTERVAL_MS = 60 * 60 * 1000;
 
 const dateHeaderFormat = new Intl.DateTimeFormat(undefined, {
   weekday: 'long',
@@ -29,23 +33,28 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [focusIndex, setFocusIndex] = useState(0);
-  const [isUserInMarket, setIsUserInMarket] = useState(
-    () => localStorage.getItem(IN_MARKET_KEY) !== 'false',
-  );
+  const [zip, setZip] = useState(() => localStorage.getItem(ZIP_KEY) ?? '');
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const initialized = useRef(false);
 
-  const loadWeek = useCallback((type: number, weekNumber: number) => {
-    setLoading(true);
-    setError(null);
-    fetchWeek(SEASON_YEAR, type, weekNumber)
-      .then((result) => {
-        setGames(result);
-        setFocusIndex(0);
-      })
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const loadWeek = useCallback(
+    (type: number, weekNumber: number, opts: { silent?: boolean } = {}) => {
+      if (!opts.silent) {
+        setLoading(true);
+        setError(null);
+      }
+      fetchWeek(SEASON_YEAR, type, weekNumber)
+        .then((result) => {
+          setGames(result);
+          if (!opts.silent) setFocusIndex(0);
+        })
+        .catch((e: Error) => {
+          if (!opts.silent) setError(e.message);
+        })
+        .finally(() => setLoading(false));
+    },
+    [],
+  );
 
   // First load: let ESPN tell us the current week.
   useEffect(() => {
@@ -69,6 +78,21 @@ export function App() {
     [loadWeek],
   );
 
+  // Keep the schedule fresh: re-pull hourly and whenever the app resumes
+  // (TVs leave apps open for days; playoff matchups and flexed games change).
+  useEffect(() => {
+    const refresh = () => loadWeek(seasonType, week, { silent: true });
+    const interval = setInterval(refresh, REFRESH_INTERVAL_MS);
+    const onVisible = () => {
+      if (!document.hidden) refresh();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [seasonType, week, loadWeek]);
+
   const grouped = useMemo(() => groupByDay(games), [games]);
   const orderedGames = useMemo(() => grouped.flatMap((g) => g.games), [grouped]);
 
@@ -76,6 +100,8 @@ export function App() {
   // Enter is handled by the focused card itself.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      // Let the ZIP field handle its own keys while it's focused.
+      if (document.activeElement instanceof HTMLInputElement) return;
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
@@ -104,11 +130,10 @@ export function App() {
     cardRefs.current[focusIndex]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }, [focusIndex, games]);
 
-  const toggleMarket = () => {
-    setIsUserInMarket((prev) => {
-      localStorage.setItem(IN_MARKET_KEY, String(!prev));
-      return !prev;
-    });
+  const onZipChange = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 5);
+    setZip(digits);
+    localStorage.setItem(ZIP_KEY, digits);
   };
 
   let cardIndex = -1;
@@ -117,9 +142,17 @@ export function App() {
     <div className="app">
       <header className="app-header">
         <h1>NFL Linker</h1>
-        <button className="market-toggle" tabIndex={-1} onClick={toggleMarket}>
-          {isUserInMarket ? 'In home market' : 'Out of market'}
-        </button>
+        <label className="zip-field">
+          ZIP
+          <input
+            className="zip-input"
+            inputMode="numeric"
+            maxLength={5}
+            placeholder="e.g. 98101"
+            value={zip}
+            onChange={(e) => onZipChange(e.target.value)}
+          />
+        </label>
       </header>
       <WeekSelector seasonType={seasonType} week={week} onChange={onWeekChange} />
       {loading && <div className="status">Loading schedule…</div>}
@@ -141,7 +174,7 @@ export function App() {
                     cardRefs.current[index] = el;
                   }}
                   game={game}
-                  isUserInMarket={isUserInMarket}
+                  isUserInMarket={isGameInMarket(game, zip)}
                   focused={index === focusIndex}
                   onFocus={() => setFocusIndex(index)}
                 />

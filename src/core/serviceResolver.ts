@@ -1,6 +1,5 @@
-import { GameCategory, type Game, type ResolveOptions, type StreamingService } from './types';
+import type { Game, ResolveOptions, StreamingService } from './types';
 import { SERVICES } from '../services/registry';
-import { categorize } from './categorizer';
 
 /** Case-insensitive substring patterns → registry entry. Order matters:
  * more specific names first (e.g. "youtube tv" before "youtube"). */
@@ -42,23 +41,24 @@ function match(
   return undefined;
 }
 
+/** Services that only carry a game inside its local broadcast market. */
+const LOCAL_ONLY_SERVICES = new Set<string>([SERVICES.paramountPlus.key, SERVICES.foxOne.key]);
+
 /**
  * Pick the streaming service that carries a game for this viewer.
  *
- * Out-of-market regional Sunday-afternoon games aren't available on the
- * local CBS/FOX streaming service — they require NFL Sunday Ticket — so the
- * market rule overrides the broadcast-derived match for that slot only.
+ * Paramount+ and Fox One stream the local CBS/FOX affiliate, so they only
+ * carry regional games inside the game's market. Out-of-market viewers get
+ * NFL Sunday Ticket for those games instead. National broadcasts are
+ * unaffected — they stream everywhere.
  */
 export function resolve(game: Game, opts: ResolveOptions): StreamingService {
-  const outOfMarketRegional =
-    game.market === 'regional' &&
-    !opts.isUserInMarket &&
-    categorize(game) === GameCategory.SUNDAY_DAY;
-  if (outOfMarketRegional) return SERVICES.sundayTicket;
-
-  return (
+  const service =
     match(game.streamingNetworks, STREAMING_PATTERNS) ??
     match(game.tvNetworks, TV_PATTERNS) ??
-    SERVICES.nflPlus
-  );
+    SERVICES.nflPlus;
+
+  const outOfMarketLocalOnly =
+    game.market === 'regional' && !opts.isUserInMarket && LOCAL_ONLY_SERVICES.has(service.key);
+  return outOfMarketLocalOnly ? SERVICES.sundayTicket : service;
 }
