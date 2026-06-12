@@ -12,6 +12,8 @@ export interface Game {
   week: number;
   /** ESPN season type: 1 = preseason, 2 = regular, 3 = postseason. */
   seasonType: number;
+  /** Season year per ESPN (the 2026 season spans Sep 2026 – Feb 2027). */
+  seasonYear: number;
   homeTeam: Team;
   awayTeam: Team;
   shortName: string;

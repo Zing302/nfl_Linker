@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Game } from '../core/types';
-import { fetchCurrentWeek, fetchWeek, SEASON_TYPES } from '../core/scheduleClient';
+import { fetchCurrentWeek, fetchWeek, isMatchupSet, SEASON_TYPES } from '../core/scheduleClient';
 import { isGameInMarket } from '../core/marketResolver';
 import { WeekSelector } from './WeekSelector';
 import { GameCard } from './GameCard';
 
-const SEASON_YEAR = new Date().getMonth() >= 6 ? new Date().getFullYear() : new Date().getFullYear() - 1;
+// The NFL season spans Sep–Feb. Through February we're still in last
+// year's season (playoffs); from March on, this year's season is the one
+// that matters — even before its schedule is released. Weeks ESPN has no
+// data for yet render as "matchups not available", never last season's.
+const NOW = new Date();
+const SEASON_YEAR = NOW.getMonth() >= 2 ? NOW.getFullYear() : NOW.getFullYear() - 1;
 const ZIP_KEY = 'nfl-linker:zip';
 // Matchups change (flex scheduling, playoff seeding), so a long-running app
 // must re-pull the schedule periodically, not just on load.
@@ -56,18 +61,27 @@ export function App() {
     [],
   );
 
-  // First load: let ESPN tell us the current week.
+  // First load: let ESPN tell us the current week. In the offseason the
+  // no-param scoreboard serves last season's games — reject those and ask
+  // for this season's week 1 instead.
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
     fetchCurrentWeek()
       .then(({ week: currentWeek, games: currentGames }) => {
-        setWeek(currentWeek);
-        setGames(currentGames);
+        if (currentGames.some((g) => g.seasonYear === SEASON_YEAR)) {
+          setWeek(currentWeek);
+          setGames(currentGames);
+          setLoading(false);
+        } else {
+          loadWeek(SEASON_TYPES.REGULAR, 1);
+        }
       })
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+      .catch((e: Error) => {
+        setError(e.message);
+        setLoading(false);
+      });
+  }, [loadWeek]);
 
   const onWeekChange = useCallback(
     (type: number, weekNumber: number) => {
@@ -93,7 +107,8 @@ export function App() {
     };
   }, [seasonType, week, loadWeek]);
 
-  const grouped = useMemo(() => groupByDay(games), [games]);
+  const setGamesOnly = useMemo(() => games.filter(isMatchupSet), [games]);
+  const grouped = useMemo(() => groupByDay(setGamesOnly), [setGamesOnly]);
   const orderedGames = useMemo(() => grouped.flatMap((g) => g.games), [grouped]);
 
   // TV-remote navigation: up/down moves card focus, left/right changes week,
@@ -157,8 +172,8 @@ export function App() {
       <WeekSelector seasonType={seasonType} week={week} onChange={onWeekChange} />
       {loading && <div className="status">Loading schedule…</div>}
       {error && <div className="status error">Couldn’t load the schedule: {error}</div>}
-      {!loading && !error && games.length === 0 && (
-        <div className="status">No games scheduled this week.</div>
+      {!loading && !error && setGamesOnly.length === 0 && (
+        <div className="status">Matchups not available yet for this week.</div>
       )}
       {!loading &&
         grouped.map(({ label, games: dayGames }) => (

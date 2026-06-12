@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fetchWeek, parseScoreboard, SEASON_TYPES } from '../src/core/scheduleClient';
+import { fetchWeek, isMatchupSet, parseScoreboard, SEASON_TYPES } from '../src/core/scheduleClient';
 import type { EspnScoreboard } from '../src/core/scheduleClient';
 import fixture from './fixtures/scoreboard-week1.json';
+import { makeGame } from './helpers';
 
 const scoreboard = fixture as EspnScoreboard;
 
@@ -18,6 +19,7 @@ describe('parseScoreboard', () => {
     expect(opener.date).toBe('2025-09-05T00:20Z');
     expect(opener.week).toBe(1);
     expect(opener.seasonType).toBe(2);
+    expect(opener.seasonYear).toBe(2025);
     expect(opener.homeTeam.abbreviation).toBe('PHI');
     expect(opener.awayTeam.abbreviation).toBe('DAL');
     expect(opener.shortName).toBe('DAL @ PHI');
@@ -51,6 +53,21 @@ describe('parseScoreboard', () => {
     expect(bare[0].tvNetworks).toEqual([]);
     expect(bare[0].streamingNetworks).toEqual([]);
     expect(bare[0].market).toBe('regional');
+  });
+});
+
+describe('isMatchupSet', () => {
+  it('rejects ESPN playoff placeholders (TBD teams, parsed from empty competitor data)', () => {
+    // An event with no team info parses to TBD teams (see parseTeam).
+    const placeholder = parseScoreboard(
+      { events: [{ id: 'x', date: '2027-01-16T05:00Z', competitions: [{}] }] },
+      SEASON_TYPES.POSTSEASON,
+    )[0];
+    expect(isMatchupSet(placeholder)).toBe(false);
+  });
+
+  it('accepts games with real teams', () => {
+    expect(isMatchupSet(makeGame())).toBe(true);
   });
 });
 

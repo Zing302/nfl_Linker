@@ -6,6 +6,7 @@ export function makeGame(overrides: Partial<Game> = {}): Game {
     date: '2025-09-07T17:00Z',
     week: 1,
     seasonType: 2,
+    seasonYear: 2025,
     homeTeam: { id: 'h', abbreviation: 'HOM', displayName: 'Home Team' },
     awayTeam: { id: 'a', abbreviation: 'AWY', displayName: 'Away Team' },
     shortName: 'AWY @ HOM',
