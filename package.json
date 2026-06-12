@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "package:tv": "npm run build && rm -rf out && mkdir -p out/stage && cp -R dist out/stage/dist && cp -R vendor/webOSTVjs-1.2.13 out/stage/dist/ && cp appinfo.json icon.png largeIcon.png out/stage/ && ares-package out/stage -o out",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"
