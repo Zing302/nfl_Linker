@@ -1,0 +1,188 @@
+{
+  "week": { "number": 1 },
+  "events": [
+    {
+      "id": "401772510",
+      "date": "2025-09-05T00:20Z",
+      "shortName": "DAL @ PHI",
+      "week": { "number": 1 },
+      "season": { "year": 2025, "type": 2 },
+      "competitions": [
+        {
+          "competitors": [
+            {
+              "homeAway": "home",
+              "team": { "id": "21", "abbreviation": "PHI", "displayName": "Philadelphia Eagles" }
+            },
+            {
+              "homeAway": "away",
+              "team": { "id": "6", "abbreviation": "DAL", "displayName": "Dallas Cowboys" }
+            }
+          ],
+          "geoBroadcasts": [
+            {
+              "type": { "id": "1", "shortName": "TV" },
+              "market": { "id": "1", "type": "National" },
+              "media": { "shortName": "NBC" }
+            },
+            {
+              "type": { "id": "4", "shortName": "Streaming" },
+              "market": { "id": "1", "type": "National" },
+              "media": { "shortName": "Peacock" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401772714",
+      "date": "2025-09-06T00:00Z",
+      "shortName": "KC @ LAC",
+      "week": { "number": 1 },
+      "season": { "year": 2025, "type": 2 },
+      "competitions": [
+        {
+          "competitors": [
+            {
+              "homeAway": "home",
+              "team": { "id": "24", "abbreviation": "LAC", "displayName": "Los Angeles Chargers" }
+            },
+            {
+              "homeAway": "away",
+              "team": { "id": "12", "abbreviation": "KC", "displayName": "Kansas City Chiefs" }
+            }
+          ],
+          "geoBroadcasts": [
+            {
+              "type": { "id": "4", "shortName": "Streaming" },
+              "market": { "id": "1", "type": "National" },
+              "media": { "shortName": "YouTube" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401772718",
+      "date": "2025-09-07T17:00Z",
+      "shortName": "PIT @ NYJ",
+      "week": { "number": 1 },
+      "season": { "year": 2025, "type": 2 },
+      "competitions": [
+        {
+          "competitors": [
+            {
+              "homeAway": "home",
+              "team": { "id": "20", "abbreviation": "NYJ", "displayName": "New York Jets" }
+            },
+            {
+              "homeAway": "away",
+              "team": { "id": "23", "abbreviation": "PIT", "displayName": "Pittsburgh Steelers" }
+            }
+          ],
+          "geoBroadcasts": [
+            {
+              "type": { "id": "1", "shortName": "TV" },
+              "market": { "id": "2", "type": "Regional" },
+              "media": { "shortName": "CBS" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401772720",
+      "date": "2025-09-07T20:25Z",
+      "shortName": "DET @ GB",
+      "week": { "number": 1 },
+      "season": { "year": 2025, "type": 2 },
+      "competitions": [
+        {
+          "competitors": [
+            {
+              "homeAway": "home",
+              "team": { "id": "9", "abbreviation": "GB", "displayName": "Green Bay Packers" }
+            },
+            {
+              "homeAway": "away",
+              "team": { "id": "8", "abbreviation": "DET", "displayName": "Detroit Lions" }
+            }
+          ],
+          "geoBroadcasts": [
+            {
+              "type": { "id": "1", "shortName": "TV" },
+              "market": { "id": "2", "type": "Regional" },
+              "media": { "shortName": "FOX" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401772722",
+      "date": "2025-09-08T00:20Z",
+      "shortName": "BAL @ BUF",
+      "week": { "number": 1 },
+      "season": { "year": 2025, "type": 2 },
+      "competitions": [
+        {
+          "competitors": [
+            {
+              "homeAway": "home",
+              "team": { "id": "2", "abbreviation": "BUF", "displayName": "Buffalo Bills" }
+            },
+            {
+              "homeAway": "away",
+              "team": { "id": "33", "abbreviation": "BAL", "displayName": "Baltimore Ravens" }
+            }
+          ],
+          "geoBroadcasts": [
+            {
+              "type": { "id": "1", "shortName": "TV" },
+              "market": { "id": "1", "type": "National" },
+              "media": { "shortName": "NBC" }
+            },
+            {
+              "type": { "id": "4", "shortName": "Streaming" },
+              "market": { "id": "1", "type": "National" },
+              "media": { "shortName": "Peacock" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401772724",
+      "date": "2025-09-09T00:15Z",
+      "shortName": "MIN @ CHI",
+      "week": { "number": 1 },
+      "season": { "year": 2025, "type": 2 },
+      "competitions": [
+        {
+          "competitors": [
+            {
+              "homeAway": "home",
+              "team": { "id": "3", "abbreviation": "CHI", "displayName": "Chicago Bears" }
+            },
+            {
+              "homeAway": "away",
+              "team": { "id": "16", "abbreviation": "MIN", "displayName": "Minnesota Vikings" }
+            }
+          ],
+          "geoBroadcasts": [
+            {
+              "type": { "id": "1", "shortName": "TV" },
+              "market": { "id": "1", "type": "National" },
+              "media": { "shortName": "ABC" }
+            },
+            {
+              "type": { "id": "4", "shortName": "Streaming" },
+              "market": { "id": "1", "type": "National" },
+              "media": { "shortName": "ESPN+" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

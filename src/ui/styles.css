@@ -1,0 +1,153 @@
+/* 10-ft UI: large type, high contrast, designed for 1920x1080. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0d1117;
+  color: #f0f3f6;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 28px;
+}
+
+.app {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px 48px 96px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-header h1 {
+  font-size: 56px;
+  margin: 0;
+}
+
+.market-toggle {
+  font-size: 26px;
+  padding: 12px 28px;
+  border-radius: 12px;
+  border: 2px solid #3b4654;
+  background: #1b2330;
+  color: #f0f3f6;
+  cursor: pointer;
+}
+
+.week-selector {
+  margin: 32px 0;
+}
+
+.season-type-row,
+.week-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.season-type-button,
+.week-button {
+  font-size: 26px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  border: 2px solid #3b4654;
+  background: #1b2330;
+  color: #f0f3f6;
+  cursor: pointer;
+}
+
+.season-type-button.active,
+.week-button.active {
+  background: #2563eb;
+  border-color: #60a5fa;
+}
+
+.day-header {
+  font-size: 38px;
+  margin: 40px 0 16px;
+  color: #93c5fd;
+}
+
+.game-card {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 24px 32px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: #161d29;
+  border: 3px solid transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.game-card.focused {
+  border-color: #60a5fa;
+  background: #1c2636;
+  transform: scale(1.01);
+}
+
+.game-card-time {
+  font-size: 30px;
+  font-weight: 700;
+  min-width: 160px;
+  color: #fbbf24;
+}
+
+.game-card-teams {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.game-card-at {
+  color: #8b98a9;
+  font-weight: 400;
+}
+
+.badge {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #7c3aed;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.watch-button {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.game-card-error {
+  width: 100%;
+  font-size: 24px;
+  color: #f87171;
+}
+
+.status {
+  font-size: 32px;
+  padding: 48px 0;
+  text-align: center;
+  color: #8b98a9;
+}
+
+.status.error {
+  color: #f87171;
+}
