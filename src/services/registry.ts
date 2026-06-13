@@ -11,7 +11,8 @@ export const SERVICES = {
   peacock: {
     key: 'peacock',
     label: 'Peacock',
-    webosAppId: 'peacock',
+    webosAppId: 'com.peacock.tv', // verified on OLED65CX
+
     webUrl: 'https://www.peacocktv.com/sports/nfl',
     color: '#000000',
   },
@@ -32,7 +33,8 @@ export const SERVICES = {
   paramountPlus: {
     key: 'paramountPlus',
     label: 'Paramount+',
-    webosAppId: 'com.cbs.app',
+    webosAppId: 'com.cbs-all-access.webapp.prod', // verified on OLED65CX
+
     webUrl: 'https://www.paramountplus.com/live-tv/',
     color: '#0064ff',
   },
@@ -60,6 +62,8 @@ export const SERVICES = {
   sundayTicket: {
     key: 'sundayTicket',
     label: 'NFL Sunday Ticket',
+    // Sunday Ticket lives inside the YouTube app (verified installed); the
+    // dedicated YouTube TV app would be youtube.leanback.ytv.v1 if present.
     webosAppId: 'youtube.leanback.v4',
     webUrl: 'https://tv.youtube.com/nfl-sunday-ticket/',
     color: '#013369',
