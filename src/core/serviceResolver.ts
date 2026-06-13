@@ -1,5 +1,6 @@
-import type { Game, ResolveOptions, StreamingService } from './types';
+import { GameCategory, type Game, type ResolveOptions, type StreamingService } from './types';
 import { SERVICES } from '../services/registry';
+import { categorize } from './categorizer';
 
 /** Case-insensitive substring patterns → registry entry. Order matters:
  * more specific names first (e.g. "youtube tv" before "youtube"). */
@@ -41,16 +42,29 @@ function match(
   return undefined;
 }
 
-/** Services that only carry a game inside its local broadcast market. */
+/** Services that stream only the local CBS/FOX affiliate. */
 const LOCAL_ONLY_SERVICES = new Set<string>([SERVICES.paramountPlus.key, SERVICES.foxOne.key]);
+
+/**
+ * Whether a game's broadcast is restricted to the local market.
+ *
+ * ESPN's geoBroadcasts `market` field reads "National" for every game when
+ * queried without a viewer location, so it can't be trusted here. Instead we
+ * use the structural rule: the market-restricted games are the Sunday-
+ * afternoon CBS/FOX broadcasts — exactly what NFL Sunday Ticket carries.
+ * National windows (SNF, TNF, MNF, Thanksgiving, Christmas, playoffs) air
+ * everywhere, so they're never restricted even when they're on CBS/FOX.
+ */
+function isMarketRestricted(game: Game, service: StreamingService): boolean {
+  return categorize(game) === GameCategory.SUNDAY_DAY && LOCAL_ONLY_SERVICES.has(service.key);
+}
 
 /**
  * Pick the streaming service that carries a game for this viewer.
  *
- * Paramount+ and Fox One stream the local CBS/FOX affiliate, so they only
- * carry regional games inside the game's market. Out-of-market viewers get
- * NFL Sunday Ticket for those games instead. National broadcasts are
- * unaffected — they stream everywhere.
+ * Paramount+ and Fox One stream the local CBS/FOX affiliate, so for a
+ * market-restricted game an out-of-market viewer can't watch there — they
+ * need NFL Sunday Ticket instead.
  */
 export function resolve(game: Game, opts: ResolveOptions): StreamingService {
   const service =
@@ -58,7 +72,8 @@ export function resolve(game: Game, opts: ResolveOptions): StreamingService {
     match(game.tvNetworks, TV_PATTERNS) ??
     SERVICES.nflPlus;
 
-  const outOfMarketLocalOnly =
-    game.market === 'regional' && !opts.isUserInMarket && LOCAL_ONLY_SERVICES.has(service.key);
-  return outOfMarketLocalOnly ? SERVICES.sundayTicket : service;
+  if (isMarketRestricted(game, service) && !opts.isUserInMarket) {
+    return SERVICES.sundayTicket;
+  }
+  return service;
 }

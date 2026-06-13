@@ -56,44 +56,33 @@ describe('resolve – TV-network fallback', () => {
 });
 
 describe('resolve – market rule', () => {
-  // Sun Sep 7 2025 13:00 ET: a regional Sunday-afternoon slot.
-  const regionalSunday = makeGame({
-    date: '2025-09-07T17:00Z',
-    market: 'regional',
-    tvNetworks: ['CBS'],
-  });
+  // Sun Sep 7 2025 13:00 ET: a Sunday-afternoon CBS slot (market-restricted).
+  // Note: market is left at the makeGame default ('national') on purpose —
+  // ESPN tags every game National, so the rule must not depend on it.
+  const cbsSunday = makeGame({ date: '2025-09-07T17:00Z', tvNetworks: ['CBS'] });
+  const foxSunday = makeGame({ date: '2025-09-07T17:00Z', tvNetworks: ['FOX'] });
 
   it('keeps the local service for in-market viewers', () => {
-    expect(resolve(regionalSunday, inMarket)).toBe(SERVICES.paramountPlus);
+    expect(resolve(cbsSunday, inMarket)).toBe(SERVICES.paramountPlus);
+    expect(resolve(foxSunday, inMarket)).toBe(SERVICES.foxOne);
   });
 
-  it('routes out-of-market viewers to Sunday Ticket', () => {
-    expect(resolve(regionalSunday, outOfMarket)).toBe(SERVICES.sundayTicket);
+  it('routes out-of-market viewers to Sunday Ticket for Sunday CBS/FOX games', () => {
+    expect(resolve(cbsSunday, outOfMarket)).toBe(SERVICES.sundayTicket);
+    expect(resolve(foxSunday, outOfMarket)).toBe(SERVICES.sundayTicket);
   });
 
-  it('does not apply Sunday Ticket to national games', () => {
-    const national = makeGame({
-      date: '2025-09-07T17:00Z',
-      market: 'national',
-      tvNetworks: ['FOX'],
-    });
-    expect(resolve(national, outOfMarket)).toBe(SERVICES.foxOne);
-  });
-
-  it('routes out-of-market regional FOX games to Sunday Ticket', () => {
-    const foxRegional = makeGame({ market: 'regional', tvNetworks: ['FOX'] });
-    expect(resolve(foxRegional, outOfMarket)).toBe(SERVICES.sundayTicket);
+  it('does not restrict national CBS/FOX windows (e.g. Thanksgiving)', () => {
+    // Thu Nov 27 2025 12:30 ET: a Thanksgiving CBS game airs nationally,
+    // so an out-of-market viewer still watches on Paramount+, not Sunday Ticket.
+    const thanksgiving = makeGame({ date: '2025-11-27T17:30Z', tvNetworks: ['CBS'] });
+    expect(resolve(thanksgiving, outOfMarket)).toBe(SERVICES.paramountPlus);
   });
 
   it('only overrides the local-affiliate services (Paramount+/Fox One)', () => {
-    // A regional game on a nationally available service stays put —
-    // Peacock streams everywhere, unlike the local CBS/FOX affiliates.
-    const nbcRegional = makeGame({
-      date: '2025-09-05T00:20Z',
-      market: 'regional',
-      tvNetworks: ['NBC'],
-    });
-    expect(resolve(nbcRegional, outOfMarket)).toBe(SERVICES.peacock);
+    // A Sunday-night NBC game streams everywhere on Peacock — never restricted.
+    const sundayNight = makeGame({ date: '2025-09-08T00:20Z', tvNetworks: ['NBC'] });
+    expect(resolve(sundayNight, outOfMarket)).toBe(SERVICES.peacock);
   });
 });
 
